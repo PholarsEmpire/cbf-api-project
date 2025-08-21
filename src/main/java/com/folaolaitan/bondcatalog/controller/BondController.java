@@ -3,6 +3,7 @@ package com.folaolaitan.bondcatalog.controller;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,9 +12,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.folaolaitan.bondcatalog.dto.BondSummary;
+//import com.folaolaitan.bondcatalog.dto.BondSummary;
 import com.folaolaitan.bondcatalog.entity.Bond;
 import com.folaolaitan.bondcatalog.service.BondService;
 
@@ -169,12 +171,12 @@ public class BondController {
 
 
 
-    @GetMapping("/issued-between/{start-date}/{end-date}")
+    @GetMapping("/issued-between")
     @Operation(
         summary = "Find bonds issued between two dates (a range of dates)",
         description = "Returns all bonds that were issued between the specified start and end dates."
     )
-    public List<Bond> findBondsByIssueDateBetween(@Parameter(description ="Start date to filter by", example = "2022-01-01") @PathVariable LocalDate startDate, @Parameter(description ="End date to filter by", example = "2022-12-31") @PathVariable LocalDate endDate) {
+    public List<Bond> findBondsByIssueDateBetween(@Parameter(description = "Start date to filter by", example = "2022-01-01") @RequestParam("start-date") LocalDate startDate, @Parameter(description = "End date to filter by", example = "2026-12-31") @RequestParam("end-date") LocalDate endDate) {
         return bondService.findBondsByIssueDateBetween(startDate, endDate);
     }
 
@@ -198,32 +200,40 @@ public class BondController {
         summary = "Find bonds with a face value greater than or equal to a specified amount",
         description = "Returns all bonds with a face value greater than or equal to the specified value."
     )
-    public List<Bond> findBondsByFaceValueGreaterThanEqual(@Parameter(description = "Face value to filter by", example = "1000") @PathVariable BigDecimal faceValue) {
-        return bondService.findBondsByFaceValueGreaterThanEqual(faceValue);
+    public List<Bond> findBondsByFaceValueGreaterThanEqual(@Parameter(description = "Face value to filter by", example = "1000") @PathVariable BigDecimal value) {
+        return bondService.findBondsByFaceValueGreaterThanEqual(value);
     }
 
 
 
 
-    @GetMapping("/face-value-between/{min-value}/{max-value}")
+    @GetMapping("/face-value-between")
     @Operation(
         summary = "Find bonds with a face value within a specified range",
         description = "Returns all bonds with a face value between the specified minimum and maximum values."
     )
-    public List<Bond> findBondsByFaceValueBetween(@Parameter(description ="Minimum face value to filter by", example = "1000") @PathVariable BigDecimal minValue, @Parameter(description ="Maximum face value to filter by", example = "5000") @PathVariable BigDecimal maxValue) {
+    public List<Bond> findBondsByFaceValueBetween(@Parameter(description ="Minimum face value to filter by", example = "1000") @RequestParam(name="min-value") BigDecimal minValue, @Parameter(description ="Maximum face value to filter by", example = "5000") @RequestParam(name="max-value")  BigDecimal maxValue) {
         return bondService.findBondsByFaceValueBetween(minValue, maxValue);
     }
 
-   
-
+    @GetMapping("/status")
+    @Operation(
+        summary = "Find bonds by status (Active, Matured, Defaulted)",
+        description = "Returns all bonds with the specified status."
+    )
+    public List<Bond> getBondsByStatus(@Parameter(description = "Status of the bond to filter by", example = "Active") @RequestParam String status) {
+        return bondService.getBondsByStatus(status);
+    }
 
     @GetMapping("/summary")
     @Operation(
         summary = "Get bonds summary",
-        description = "Returns a summary of the bond catalog, including total number of bonds, total face value, and average coupon rate."
+        description = "Returns statistics about the bond catalog, such as the total number of bonds, average coupon rate, highest coupon rate, unique issuers, etc."
     )
-    public BondSummary getBondSummary() {
-        return bondService.getBondSummary();
+    @ApiResponse(responseCode = "200", description = "Bond summary retrieved successfully")
+    public Map<String, Object> summary() {
+        return bondService.getSummary();
     }
+
 
 }

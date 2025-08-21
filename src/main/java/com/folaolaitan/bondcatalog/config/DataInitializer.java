@@ -16,9 +16,7 @@ public class DataInitializer {
     @Bean
     CommandLineRunner commandLineRunner(BondRepository bondRepository) {
         return args -> {
-            // Initial data setup can be done here if needed
-            // For example, you can create some default bonds
-            // bondService.createBond(new Bond(...));
+            // Initial data to test mys API
 
             bondRepository.save(new Bond(
                     null,

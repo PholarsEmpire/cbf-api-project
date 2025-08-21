@@ -2,12 +2,14 @@ package com.folaolaitan.bondcatalog.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.folaolaitan.bondcatalog.dto.BondSummary;
+//import com.folaolaitan.bondcatalog.dto.BondSummary;
 import com.folaolaitan.bondcatalog.entity.Bond;
 import com.folaolaitan.bondcatalog.repository.BondRepository;
 
@@ -96,16 +98,42 @@ public class BondService {
         return bondRepository.findByFaceValueBetween(minValue, maxValue);
     }
 
-    // public List<Bond> findBondsByCouponRateOrderByCouponRateAsc() {
-    //     return bondRepository.findByCouponRateOrderByCouponRateAsc();
+    public List<Bond> getBondsByStatus(String status) {
+        return bondRepository.findByStatus(status);
+    }
+
+
+
+    // public BondSummary getBondSummary() {
+    //     return bondRepository.summaryOfBonds();
     // }
 
+    
+    public Map<String, Object> getSummary() {
+        long totalBonds = bondRepository.count();
+        BigDecimal avgCoupon = bondRepository.avgCouponRate();
+        String maxRating = bondRepository.maxRating();
+        String uniqueIssuers = bondRepository.uniqueIssuers();
+        Bond highestCouponBond = bondRepository.findTopByOrderByCouponRateDesc();
+        Bond lowestCouponBond = bondRepository.findBottomByOrderByCouponRateDesc();
+        Bond nextMaturityBond = bondRepository.findTopByOrderByMaturityDateAsc();
 
+        LocalDate today = LocalDate.now();
+        long maturitiesNext90d = bondRepository.countByMaturityDateBetween(today, today.plusDays(90));
 
-
-
-
-    public BondSummary getBondSummary() {
-        return bondRepository.summaryOfBonds();
-    }
+        // Prepare summary map
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("totalBonds", totalBonds);
+        summary.put("avgCouponRate", avgCoupon);
+        summary.put("maxRating", maxRating);
+        summary.put("uniqueIssuers", uniqueIssuers);
+        summary.put("highestCoupon", highestCouponBond != null ? highestCouponBond.getCouponRate() : null);
+        summary.put("lowestCoupon", lowestCouponBond != null ? lowestCouponBond.getCouponRate() : null);
+        summary.put("highestCouponBondName", highestCouponBond != null ? highestCouponBond.getName() : null);
+        summary.put("lowestCouponBondName", lowestCouponBond != null ? lowestCouponBond.getName() : null);
+        summary.put("nextMaturityBondName", nextMaturityBond != null ? nextMaturityBond.getName() : null);
+        summary.put("nextMaturityBondDate", nextMaturityBond != null ? nextMaturityBond.getMaturityDate() : null);
+        summary.put("maturitiesInNext90Days", maturitiesNext90d);
+        return summary;
+  }
 }

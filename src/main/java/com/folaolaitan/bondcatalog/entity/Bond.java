@@ -19,7 +19,7 @@ public class Bond {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    // Attributes of the bond
+    // Other attributes of the bond
     private String name;
     private String issuer;
     private BigDecimal faceValue;
@@ -27,11 +27,11 @@ public class Bond {
     private String rating;
     private LocalDate issueDate;
     private LocalDate maturityDate;
+    private String status; // e.g., "Active", "Matured", "Defaulted"
 
 
     public Bond() {
-        // Default constructor for JP
-    
+        // Default constructor for JPA
     }
 
     // Constructor to initialize all fields
@@ -44,9 +44,26 @@ public class Bond {
         this.rating = rating;
         this.issueDate = issueDate;
         this.maturityDate = maturityDate;
+        this.status = calculateStatus();
     }
-    
- 
+
+    private String calculateStatus() {
+        boolean flaggedDefault = false;    // This will be set in the DB based on some business logic or conditions (e.g., payment history)
+        if (flaggedDefault) {
+            return "Defaulted";
+        } else if (maturityDate.isBefore(LocalDate.now())) {
+            return "Matured";
+        } else {
+            return "Active";
+        }
+    }
+
+
+    //getters and setters
+    public String getStatus() {
+        return status;
+    }
+
     public Long getId() {
         return id;
     }

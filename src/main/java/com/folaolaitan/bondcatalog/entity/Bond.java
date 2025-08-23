@@ -8,12 +8,15 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 /**
  * Represents a bond entity with its attributes.
  */
 @Entity
-@Table(name = "bonds")
+@Table(name = "bonds",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"name", "issuer", "maturity_date"}) //add unique constraint to prevent duplicate bonds in the DB
+)
 public class Bond {
     // Unique identifier for the bond
     @Id

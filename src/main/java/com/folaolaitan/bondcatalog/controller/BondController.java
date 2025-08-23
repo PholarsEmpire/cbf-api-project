@@ -1,239 +1,245 @@
 package com.folaolaitan.bondcatalog.controller;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
-//import com.folaolaitan.bondcatalog.dto.BondSummary;
 import com.folaolaitan.bondcatalog.entity.Bond;
+import com.folaolaitan.bondcatalog.customexceptions.BadRequestException;
 import com.folaolaitan.bondcatalog.service.BondService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/bonds")   
-@Tag(name = "Fixed Income (Bond) Catalog API", description = "Endpoints for managing fixed income/bond investments in the catalog")
+@RequestMapping("/api/bonds")
+@Tag(name = "Fixed Income (Bond) Catalog API",
+     description = "Endpoints for managing fixed-income/bond investments")
 public class BondController {
-    // This class will handle HTTP requests related to bonds
-    // Methods for creating, updating, deleting, and retrieving bonds will be added here
-    // For example:
-    // @GetMapping, @PostMapping, @PutMapping, @DeleteMapping annotations can be used to map HTTP methods to these methods
 
-    private final BondService bondService;
-    // Constructor injection for BondService
-    // This allows the controller to use the service layer for business logic
-    public BondController(BondService bondService) {
-        this.bondService = bondService;
+    private final BondService service;
+
+    public BondController(BondService service) {
+        this.service = service;
     }
+
+    // ---------- CORE CRUD ----------
 
     @GetMapping
-    @Operation(
-        summary = "Returns the list of all bonds",
-        description = "Retrieves all bonds from the catalog."
-    )
+    @Operation(summary = "List all bonds", description = "Retrieves every bond in the catalog.")
     public List<Bond> getAllBonds() {
-        return bondService.getAllBonds();
+        return service.getAllBonds();
     }
-
-
 
     @GetMapping("/{id}")
-    @Operation(
-        summary = "Get a specificbond by ID",
-        description = "Retrieves a bond by its unique identifier."
-    )
+    @Operation(summary = "Get a bond by ID",
+               description = "Returns the bond with the given ID, or 404 if not found.")
+    @ApiResponse(responseCode = "200", description = "Bond found")
+    @ApiResponse(responseCode = "404", description = "Bond not found")
     public Bond getBond(@PathVariable Long id) {
-        return bondService.getBondById(id).orElseThrow(() -> new RuntimeException("Bond not found"));
+        return service.getBondById(id); // throws ResourceNotFoundException if missing
     }
-
-
 
     @PostMapping
-    @Operation(
-        summary = "Creates and adds a new bond to the catalog",
-        description = "Adds a new bond to the catalog."
-    )
+    @Operation(summary = "Create a new bond",
+               description = "Creates a bond. ID must be null; DB will generate it.")
+    @ApiResponse(responseCode = "200", description = "Bond created")
+    @ApiResponse(responseCode = "400", description = "Invalid input")
     public Bond createBond(@RequestBody Bond bond) {
-        return bondService.createBond(bond);
+        return service.createBond(bond); // throws BadRequestException if ID not null
     }
-
-
-
 
     @PutMapping("/{id}")
-    @Operation(
-        summary = "Updates an existing bond using its ID",
-        description = "Updates the details of an existing bond in the catalog."
-    )
+    @Operation(summary = "Update an existing bond",
+               description = "Updates the bond with the given ID.")
+    @ApiResponse(responseCode = "200", description = "Bond updated")
+    @ApiResponse(responseCode = "404", description = "Bond not found")
     public Bond updateBond(@PathVariable Long id, @RequestBody Bond bond) {
-        return bondService.updateBond(id, bond);
+        return service.updateBond(id, bond);
     }
-
-
 
     @DeleteMapping("/{id}")
-    @Operation(
-        summary = "Deletes a bond by ID",
-        description = "Removes a bond from the catalog using its unique identifier."
-    )
+    @Operation(summary = "Delete a bond", description = "Deletes the bond with the given ID.")
+    @ApiResponse(responseCode = "200", description = "Bond deleted")
+    @ApiResponse(responseCode = "404", description = "Bond not found")
     public void deleteBond(@PathVariable Long id) {
-        bondService.deleteBond(id);
+        service.deleteBond(id);
     }
 
-
-
+    // ---------- SEARCH / FILTER ----------
 
     @GetMapping("/issuer/{issuer}")
-    @Operation(
-        summary = "Search bonds by issuer",
-        description = "Finds bonds where the issuer name matches the search keyword."
-         )
-    @ApiResponse(responseCode = "200", description = "Bonds found successfully")
-    public List<Bond> findBondsByIssuer(@Parameter(description = "Issuer name to search for", example = "Apple Inc") @PathVariable String issuer) {
-        return bondService.findBondsByIssuer(issuer);
+    @Operation(summary = "Search bonds by issuer",
+               description = "Case-insensitive contains search by issuer name.")
+    public List<Bond> findBondsByIssuer(
+            @Parameter(description = "Issuer name to search for", example = "Apple Inc")
+            @PathVariable String issuer) {
+        return service.findBondsByIssuer(issuer);
     }
-
-
-
 
     @GetMapping("/rating/{rating}")
-    @Operation(
-        summary = "Filters bonds by a specific credit rating",
-        description = "Returns all bonds that match the given credit rating."
-    )
-    public List<Bond> findBondsByRating(@Parameter(description = "Credit rating of the bond to search for", example = "AAA") @PathVariable String rating) {
-        return bondService.findBondsByRating(rating);
+    @Operation(summary = "Filter bonds by rating",
+               description = "Returns all bonds that match the given credit rating.")
+    public List<Bond> findBondsByRating(
+            @Parameter(description = "Rating to filter", example = "AAA")
+            @PathVariable String rating) {
+        return service.findBondsByRating(rating);
     }
-
-
-
 
     @GetMapping("/coupon-rate/{rate}")
-    @Operation(
-        summary = "Find high-yield bonds",
-        description = "Returns all bonds with a coupon rate greater than or equal to the provided value."
-    )
-    public List<Bond> findBondsByCouponRateGreaterThanEqual(@Parameter(description = "Minimum coupon rate to filter by", example = "5.5") @PathVariable BigDecimal rate) {
-        return bondService.findBondsByCouponRateGreaterThanEqual(rate);
+    @Operation(summary = "Find bonds with coupon ≥ rate",
+               description = "Returns bonds with coupon rate greater than or equal to the given value.")
+    public List<Bond> findBondsByCouponRateGreaterThanEqual(
+            @Parameter(description = "Minimum coupon rate", example = "5.50")
+            @PathVariable BigDecimal rate) {
+        if (rate == null || rate.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BadRequestException("Rate must be > 0.");
+        }
+        return service.findBondsByCouponRateGreaterThanEqual(rate);
     }
 
-
-
-
-    @GetMapping("/coupon-rate/{min-rate}/{max-rate}")
-    @Operation(
-        summary = "Find bonds within a specific coupon rate range",
-        description = "Returns all bonds with a coupon rate between the specified minimum and maximum values."
-    )
-    public List<Bond> findBondsByCouponRateBetween(Double minRate, Double maxRate) {
-        return bondService.findBondsByCouponRateBetween(minRate, maxRate);
+    @GetMapping("/coupon-rate/{min}/{max}")
+    @Operation(summary = "Find bonds by coupon rate range",
+               description = "Returns bonds with coupon rate between min and max (inclusive).")
+    public List<Bond> findBondsByCouponRateBetween(
+            @Parameter(description = "Minimum coupon rate", example = "3.00")
+            @PathVariable("min") Double minRate,
+            @Parameter(description = "Maximum coupon rate", example = "8.00")
+            @PathVariable("max") Double maxRate) {
+        if (minRate == null || maxRate == null || minRate <= 0 || maxRate <= 0 || minRate > maxRate) {
+            throw new BadRequestException("Invalid range. Ensure min/max are > 0 and min ≤ max.");
+        }
+        return service.findBondsByCouponRateBetween(minRate, maxRate);
     }
-
-
-
 
     @GetMapping("/maturing-between/{start}/{end}")
-    @Operation(
-        summary = "Find bonds maturing between two dates",
-        description = "Returns all bonds that mature between the specified start and end dates. Format: yyyy-MM-dd"
-    )
-    public List<Bond> findBondsByMaturityDateBetween(@Parameter(description = "Start date to filter by", example = "2025-01-01") @PathVariable LocalDate start, @Parameter(description = "End date to filter by", example = "2025-12-31") @PathVariable LocalDate end) {
-        return bondService.findBondsByMaturityDateBetween(start, end);
+    @Operation(summary = "Find bonds maturing between two dates",
+               description = "Dates must be ISO format YYYY-MM-DD.")
+    public List<Bond> findBondsByMaturityDateBetween(
+            @Parameter(description = "Start date", example = "2025-01-01")
+            @PathVariable String start,
+            @Parameter(description = "End date", example = "2025-12-31")
+            @PathVariable String end) {
+        try {
+            LocalDate s = LocalDate.parse(start);
+            LocalDate e = LocalDate.parse(end);
+            if (e.isBefore(s)) {
+                throw new BadRequestException("End date must be on/after start date.");
+            }
+            return service.findBondsByMaturityDateBetween(s, e);
+        } catch (DateTimeParseException ex) {
+            throw new BadRequestException("Dates must be in ISO format YYYY-MM-DD.");
+        }
     }
-
-
-
 
     @GetMapping("/maturity-date/{date}")
-    @Operation(
-        summary = "Find bonds maturing after a specific date",
-        description = "Returns all bonds that mature after the specified date."
-    )
-    public List<Bond> findBondsByMaturityDateAfter(@Parameter(description ="Maturity date to filter by", example = "2026-12-31") @PathVariable LocalDate date) {
-        return bondService.findBondsByMaturityDateAfter(date);
+    @Operation(summary = "Find bonds maturing after a date",
+               description = "Date must be ISO format YYYY-MM-DD.")
+    public List<Bond> findBondsByMaturityDateAfter(
+            @Parameter(description = "Date", example = "2026-12-31")
+            @PathVariable String date) {
+        try {
+            LocalDate d = LocalDate.parse(date);
+            return service.findBondsByMaturityDateAfter(d);
+        } catch (DateTimeParseException ex) {
+            throw new BadRequestException("Date must be in ISO format YYYY-MM-DD.");
+        }
     }
-
-
 
     @GetMapping("/issued-between")
-    @Operation(
-        summary = "Find bonds issued between two dates (a range of dates)",
-        description = "Returns all bonds that were issued between the specified start and end dates."
-    )
-    public List<Bond> findBondsByIssueDateBetween(@Parameter(description = "Start date to filter by", example = "2022-01-01") @RequestParam("start-date") LocalDate startDate, @Parameter(description = "End date to filter by", example = "2026-12-31") @RequestParam("end-date") LocalDate endDate) {
-        return bondService.findBondsByIssueDateBetween(startDate, endDate);
+    @Operation(summary = "Find bonds issued between two dates",
+               description = "Dates must be ISO format YYYY-MM-DD. Uses query params `start-date` and `end-date`.")
+    public List<Bond> findBondsByIssueDateBetween(
+            @Parameter(description = "Start date", example = "2022-01-01")
+            @RequestParam(name = "start-date") String startDate,
+            @Parameter(description = "End date", example = "2026-12-31")
+            @RequestParam(name = "end-date") String endDate) {
+        try {
+            LocalDate s = LocalDate.parse(startDate);
+            LocalDate e = LocalDate.parse(endDate);
+            if (e.isBefore(s)) {
+                throw new BadRequestException("End date must be on/after start date.");
+            }
+            return service.findBondsByIssueDateBetween(s, e);
+        } catch (DateTimeParseException ex) {
+            throw new BadRequestException("Dates must be in ISO format YYYY-MM-DD.");
+        }
     }
-
-
-
 
     @GetMapping("/issue-date/{date}")
-    @Operation(
-        summary = "Find bonds issued after a specific date",
-        description = "Returns all bonds that were issued after the specified date."
-    )
-    public List<Bond> findBondsByIssueDateAfter(@Parameter(description = "Issue date to filter by", example = "2022-01-01") @PathVariable LocalDate date) {
-        return bondService.findBondsByIssueDateAfter(date);
+    @Operation(summary = "Find bonds issued after a date",
+               description = "Date must be ISO format YYYY-MM-DD.")
+    public List<Bond> findBondsByIssueDateAfter(
+            @Parameter(description = "Date", example = "2022-01-01")
+            @PathVariable String date) {
+        try {
+            LocalDate d = LocalDate.parse(date);
+            return service.findBondsByIssueDateAfter(d);
+        } catch (DateTimeParseException ex) {
+            throw new BadRequestException("Date must be in ISO format YYYY-MM-DD.");
+        }
     }
-
-
-
 
     @GetMapping("/face-value/{value}")
-    @Operation(
-        summary = "Find bonds with a face value greater than or equal to a specified amount",
-        description = "Returns all bonds with a face value greater than or equal to the specified value."
-    )
-    public List<Bond> findBondsByFaceValueGreaterThanEqual(@Parameter(description = "Face value to filter by", example = "1000") @PathVariable BigDecimal value) {
-        return bondService.findBondsByFaceValueGreaterThanEqual(value);
+    @Operation(summary = "Find bonds with face value ≥ value",
+               description = "Returns bonds with face value greater than or equal to the specified amount.")
+    public List<Bond> findBondsByFaceValueGreaterThanEqual(
+            @Parameter(description = "Minimum face value", example = "1000")
+            @PathVariable BigDecimal value) {
+        if (value == null || value.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BadRequestException("Face value must be > 0.");
+        }
+        return service.findBondsByFaceValueGreaterThanEqual(value);
     }
 
-
-
-
     @GetMapping("/face-value-between")
-    @Operation(
-        summary = "Find bonds with a face value within a specified range",
-        description = "Returns all bonds with a face value between the specified minimum and maximum values."
-    )
-    public List<Bond> findBondsByFaceValueBetween(@Parameter(description ="Minimum face value to filter by", example = "1000") @RequestParam(name="min-value") BigDecimal minValue, @Parameter(description ="Maximum face value to filter by", example = "5000") @RequestParam(name="max-value")  BigDecimal maxValue) {
-        return bondService.findBondsByFaceValueBetween(minValue, maxValue);
+    @Operation(summary = "Find bonds by face value range",
+               description = "Uses query params `min-value` and `max-value`. Both must be > 0 and min ≤ max.")
+    public List<Bond> findBondsByFaceValueBetween(
+            @Parameter(description = "Minimum face value", example = "1000")
+            @RequestParam(name = "min-value") BigDecimal minValue,
+            @Parameter(description = "Maximum face value", example = "5000")
+            @RequestParam(name = "max-value") BigDecimal maxValue) {
+        if (minValue == null || maxValue == null
+                || minValue.compareTo(maxValue) > 0
+                || minValue.compareTo(BigDecimal.ZERO) <= 0
+                || maxValue.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BadRequestException("Invalid face value range. Both must be > 0 and min ≤ max.");
+        }
+        return service.findBondsByFaceValueBetween(minValue, maxValue);
     }
 
     @GetMapping("/status")
-    @Operation(
-        summary = "Find bonds by status (Active, Matured, Defaulted)",
-        description = "Returns all bonds with the specified status."
-    )
-    public List<Bond> getBondsByStatus(@Parameter(description = "Status of the bond to filter by", example = "Active") @RequestParam String status) {
-        return bondService.getBondsByStatus(status);
+    @Operation(summary = "Find bonds by status",
+               description = "Allowed values: Active, Matured, Defaulted. Returns 200 with [] if none.")
+    public ResponseEntity<List<Bond>> getBondsByStatus(
+            @Parameter(description = "Bond status", example = "Active")
+            @RequestParam String status) {
+        List<Bond> list = service.getBondsByStatus(status); // service validates values
+        if (list.isEmpty()) {
+            return ResponseEntity.ok()
+                    .header("X-Message", "No bonds found with status: " + status)
+                    .body(list);
+        }
+        return ResponseEntity.ok(list);
     }
 
+    // ---------- SUMMARY ----------
+
     @GetMapping("/summary")
-    @Operation(
-        summary = "Get bonds summary",
-        description = "Returns statistics about the bond catalog, such as the total number of bonds, average coupon rate, highest coupon rate, unique issuers, etc."
-    )
-    @ApiResponse(responseCode = "200", description = "Bond summary retrieved successfully")
+    @Operation(summary = "Get bond catalog summary",
+               description = "Provides statistics about the bond catalog, such as total bonds, average coupon rate, highest coupon rate, unique issuers, etc.")
+    @ApiResponse(responseCode = "200", description = "Summary returned")
     public Map<String, Object> summary() {
-        return bondService.getSummary();
+        return service.getSummary();
     }
+
+
 
 
 }

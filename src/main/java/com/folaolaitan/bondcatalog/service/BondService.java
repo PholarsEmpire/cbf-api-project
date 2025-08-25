@@ -114,8 +114,8 @@ public class BondService {
     }
 
     public List<Bond> findBondsByIssueDateBetween(LocalDate startDate, LocalDate endDate) {
-        if(startDate.isAfter(endDate)){
-            throw new BadRequestException("Start date cannot be after end date.");
+        if(startDate.isAfter(endDate) || startDate.isAfter(LocalDate.now()) || endDate.isAfter(LocalDate.now())) {
+            throw new BadRequestException("Start date cannot be after end date. And both dates must be in the past (i.e., before today).");
         }
         return bondRepository.findByIssueDateBetween(startDate, endDate);
     }

@@ -92,7 +92,7 @@ public class BondController {
     }
 
     @GetMapping("/coupon-rate/{rate}")
-    @Operation(summary = "Find bonds with coupon ≥ rate",
+    @Operation(summary = "Find bonds with coupon ≥ specified rate",
                description = "Returns bonds with coupon rate greater than or equal to the given value.")
     public List<Bond> findBondsByCouponRateGreaterThanEqual(
             @Parameter(description = "Minimum coupon rate", example = "5.50")
@@ -186,7 +186,7 @@ public class BondController {
     }
 
     @GetMapping("/face-value/{value}")
-    @Operation(summary = "Find bonds with face value ≥ value",
+    @Operation(summary = "Find bonds with face value ≥ specified value",
                description = "Returns bonds with face value greater than or equal to the specified amount.")
     public List<Bond> findBondsByFaceValueGreaterThanEqual(
             @Parameter(description = "Minimum face value", example = "1000")
@@ -215,8 +215,8 @@ public class BondController {
     }
 
     @GetMapping("/status")
-    @Operation(summary = "Find bonds by status",
-               description = "Allowed values: Active, Matured, Defaulted. Returns 200 with [] if none.")
+    @Operation(summary = "Find bonds by status (Active, Matured, Defaulted)",
+               description = "Allowed values: Active, Matured, Defaulted. Returns 200 with an empty list [] if none.")
     public ResponseEntity<List<Bond>> getBondsByStatus(
             @Parameter(description = "Bond status", example = "Active")
             @RequestParam String status) {

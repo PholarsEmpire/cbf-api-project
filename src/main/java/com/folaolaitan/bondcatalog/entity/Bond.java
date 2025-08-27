@@ -3,30 +3,20 @@ package com.folaolaitan.bondcatalog.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 /**
  * Represents a bond entity with its attributes.
  */
 @Entity
+@DiscriminatorValue("BOND")
 @Table(name = "bonds")
-public class Bond {
-    // Unique identifier for the bond
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-    // Other attributes of the bond
-    private String name;
-    private String issuer;
+public class Bond extends Asset {
+
     private BigDecimal faceValue;
     private BigDecimal couponRate;
-    private String rating;
-    private LocalDate issueDate;
-    private LocalDate maturityDate;
     private String status; // e.g., "Active", "Matured", "Defaulted"
 
 
@@ -35,15 +25,10 @@ public class Bond {
     }
 
     // Constructor to initialize all fields
-    public Bond(Long id, String name, String issuer, BigDecimal faceValue, BigDecimal couponRate, String rating, LocalDate issueDate, LocalDate maturityDate) {
-        this.id = id;
-        this.name = name;
-        this.issuer = issuer;
+    public Bond(Long id, String name, String issuer, BigDecimal faceValue, BigDecimal couponRate, String rating, LocalDate issueDate, LocalDate maturityDate, String currency) {
+        super(id, name, issuer, rating, issueDate, maturityDate, currency);
         this.faceValue = faceValue;
         this.couponRate = couponRate;
-        this.rating = rating;
-        this.issueDate = issueDate;
-        this.maturityDate = maturityDate;
         this.status = calculateStatus();
     }
 
@@ -64,24 +49,6 @@ public class Bond {
         return status;
     }
 
-    public Long getId() {
-        return id;
-    }
-    public void setId(Long id) {
-        this.id = id;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public String getIssuer() {
-        return issuer;
-    }
-    public void setIssuer(String issuer) {
-        this.issuer = issuer;
-    }
     public BigDecimal getFaceValue() {
         return faceValue;
     }
@@ -94,18 +61,7 @@ public class Bond {
     public void setCouponRate(BigDecimal couponRate) {
         this.couponRate = couponRate;
     }
-    public String getRating() {
-        return rating;
-    }
-    public void setRating(String rating) {
-        this.rating = rating;
-    }
-    public LocalDate getIssueDate() {
-        return issueDate;
-    }
-    public void setIssueDate(LocalDate issueDate) {
-        this.issueDate = issueDate;
-    }
+  
     public LocalDate getMaturityDate() {
         return maturityDate;
     }

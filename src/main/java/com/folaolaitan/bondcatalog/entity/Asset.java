@@ -1,6 +1,9 @@
 package com.folaolaitan.bondcatalog.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 
 @Entity
@@ -13,12 +16,29 @@ public abstract class Asset {
     protected Long id;
 
     // Common fields across all assets
-    protected String name;                
-    protected String issuer;              
-    protected String rating;              
+    @Column(nullable = false)
+    @NotBlank(message = "Name is mandatory")
+    protected String name;  
+    
+    @Column(nullable = false)
+    @NotBlank(message = "Issuer is mandatory")
+    protected String issuer;
+
+    @Column(nullable = false)
+    @NotBlank(message = "Rating is mandatory")
+    protected String rating;
+
+    @Column(nullable = false)
+    @NotNull(message = "Issue date is mandatory")
     protected LocalDate issueDate;
+
+    @Column(nullable = false)
+    @NotNull(message = "Maturity date is mandatory")
     protected LocalDate maturityDate;
-    protected String currency;            // optional but nice: “USD”, “GBP”, "NGN"
+
+    @Column(nullable = false)
+    @NotBlank(message = "Currency is mandatory")
+    protected String currency;
 
     //Default Constructor
     public Asset() {}  

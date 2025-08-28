@@ -3,9 +3,11 @@ package com.folaolaitan.bondcatalog.entity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 
 /**
  * Represents a bond entity with its attributes.
@@ -15,8 +17,14 @@ import jakarta.persistence.Table;
 @Table(name = "bonds")
 public class Bond extends Asset {
 
+    @Column(nullable = false)
+    @NotNull(message = "Face value is mandatory")
     private BigDecimal faceValue;
+
+    @Column(nullable = false)
+    @NotNull(message = "Coupon rate is mandatory")
     private BigDecimal couponRate;
+
     private String status; // e.g., "Active", "Matured", "Defaulted"
 
 

@@ -12,13 +12,19 @@ import com.folaolaitan.bondcatalog.repository.BondRepository;
 
 @Configuration
 public class DataInitializer {
+        // Helper method to insert bond only if it doesn't already exist
+        private void insertIfMissing(BondRepository repo, Bond b) {
+                if (!repo.existsByNameAndIssuerAndMaturityDate(b.getName(), b.getIssuer(), b.getMaturityDate())) {
+                repo.save(b);
+                }
+         }
 
     @Bean
     CommandLineRunner commandLineRunner(BondRepository bondRepository) {
         return args -> {
             // Initial data to test mys API
 
-            bondRepository.save(new Bond(
+            insertIfMissing(bondRepository, new Bond(
                     null,
                     "US Treasury Bond 10Y",
                     "US Government",
@@ -29,7 +35,7 @@ public class DataInitializer {
                     LocalDate.of(2033, 12, 31), "USD"
             ));
 
-            bondRepository.save(new Bond(
+            insertIfMissing(bondRepository, new Bond(
                     null,
                     "Corporate Bond - Apple Inc",
                     "Apple Inc",
@@ -40,7 +46,7 @@ public class DataInitializer {
                     LocalDate.of(2030, 6, 30), "USD"
             ));
 
-            bondRepository.save(new Bond(
+            insertIfMissing(bondRepository, new Bond(
                     null,
                     "Green Energy Bond",
                     "GreenFuture Ltd",
@@ -51,7 +57,7 @@ public class DataInitializer {
                     LocalDate.of(2029, 3, 15), "USD"
             ));
 
-            bondRepository.save(new Bond(
+            insertIfMissing(bondRepository, new Bond(
                     null,
                     "Emerging Market Bond",
                     "Govt of Nigeria",
@@ -62,7 +68,7 @@ public class DataInitializer {
                     LocalDate.of(2031, 10, 20), "NGN"
             ));
 
-            bondRepository.save(new Bond(
+            insertIfMissing(bondRepository, new Bond(
                     null,
                     "Eurobond - Mercedes Benz",
                     "Mercedes Benz AG",

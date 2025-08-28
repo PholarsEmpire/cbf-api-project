@@ -32,7 +32,7 @@ public class DataInitializer {
                     new BigDecimal("3.25"),
                     "AAA",
                     LocalDate.of(2023, 1, 1),
-                    LocalDate.of(2033, 12, 31)
+                    LocalDate.of(2033, 12, 31), "USD"
             ));
 
             insertIfMissing(bondRepository, new Bond(
@@ -43,7 +43,7 @@ public class DataInitializer {
                     new BigDecimal("4.50"),
                     "AA+",
                     LocalDate.of(2022, 4, 15),
-                    LocalDate.of(2030, 6, 30)
+                    LocalDate.of(2030, 6, 30), "USD"
             ));
 
             insertIfMissing(bondRepository, new Bond(
@@ -54,7 +54,7 @@ public class DataInitializer {
                     new BigDecimal("5.00"),
                     "A",
                     LocalDate.of(2021, 8, 10),
-                    LocalDate.of(2029, 3, 15)
+                    LocalDate.of(2029, 3, 15), "USD"
             ));
 
             insertIfMissing(bondRepository, new Bond(
@@ -65,7 +65,7 @@ public class DataInitializer {
                     new BigDecimal("7.00"),
                     "BB",
                     LocalDate.of(2020, 11, 1),
-                    LocalDate.of(2031, 10, 20)
+                    LocalDate.of(2031, 10, 20), "NGN"
             ));
 
             insertIfMissing(bondRepository, new Bond(
@@ -76,7 +76,7 @@ public class DataInitializer {
                     new BigDecimal("2.75"),
                     "AA",
                     LocalDate.of(2019, 3, 25),
-                    LocalDate.of(2028, 9, 1)
+                    LocalDate.of(2028, 9, 1), "EUR"
             ));
 
             System.out.println("✅ Sample bonds with issue/maturity dates inserted.");

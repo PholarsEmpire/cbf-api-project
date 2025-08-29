@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 
-@CrossOrigin
 @RestController
 @RequestMapping("/api/bonds")
 @Tag(name = "Fixed Income (Bond) Catalog API",

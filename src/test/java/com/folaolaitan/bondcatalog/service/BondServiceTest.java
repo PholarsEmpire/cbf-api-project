@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -271,6 +272,38 @@ class BondServiceTest {
         assertThatThrownBy(() -> service.getBondsByStatus("Weird"))
                 .isInstanceOf(BadRequestException.class);
     }
+
+    
+    @Test
+    void getBondsByStatus_invalid_throwsBadRequest() {
+        assertThatThrownBy(() -> service.getBondsByStatus("Weird"))
+            .isInstanceOf(BadRequestException.class)
+            .hasMessageContaining("Allowed values");
+    }
+
+    
+    @Test
+    void findByIssueDateBetween_equalDates_ok() {
+        LocalDate d = LocalDate.of(2020,1,1);
+        when(repo.findByIssueDateBetween(d, d)).thenReturn(List.of(bond));
+        assertThat(service.findBondsByIssueDateBetween(d, d)).hasSize(1);
+    }
+
+    
+    @Test
+    void findByFaceValueBetween_equalEdges_ok() {
+        BigDecimal v = new BigDecimal("1000");
+        when(repo.findByFaceValueBetween(v, v)).thenReturn(List.of(bond));
+        assertThat(service.findBondsByFaceValueBetween(v, v)).hasSize(1);
+    }
+
+    
+    @Test
+    void findBondsByCouponRateBetween_equalEdges_ok() {
+        when(repo.findByCouponRateBetween(3.5, 3.5)).thenReturn(List.of(bond));
+        assertThat(service.findBondsByCouponRateBetween(3.5, 3.5)).hasSize(1);
+    }
+
 
     // ---- Summary ----
 

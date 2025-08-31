@@ -139,5 +139,55 @@ class BondIntegrationTest {
         .andExpect(jsonPath("$", hasSize(0)));
     }
 
+    @Test
+    void create_update_delete_flow_IT() throws Exception {
+        // 1) CREATE
+        Bond incoming = new Bond(null, "Flow 2032", "FlowCorp",
+                new BigDecimal("1000"), new BigDecimal("4.20"), "A",
+                LocalDate.of(2024, 6, 1), LocalDate.of(2032, 6, 1), "USD");
+
+        String createdJson = mvc.perform(post("/api/bonds")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(incoming)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id", notNullValue()))
+                .andReturn().getResponse().getContentAsString();
+
+        Bond saved = om.readValue(createdJson, Bond.class);
+
+        // 2) UPDATE
+        Bond patch = new Bond(null, "Flow 2032 Updated", "FlowCorp",
+                new BigDecimal("2000"), new BigDecimal("4.50"), "AA",
+                incoming.getIssueDate(), incoming.getMaturityDate(), "USD");
+
+        mvc.perform(put("/api/bonds/" + saved.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(om.writeValueAsString(patch)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name", is("Flow 2032 Updated")))
+                .andExpect(jsonPath("$.faceValue", is(2000)));
+
+        // 3) DELETE
+        mvc.perform(delete("/api/bonds/" + saved.getId()))
+                .andExpect(status().isOk());
+
+        assertThat(repo.findById(saved.getId())).isEmpty();
+    }
+
+    @Test
+    void issuer_search_IT() throws Exception {
+        mvc.perform(get("/api/bonds/issuer/Gov"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].issuer", hasItem("Gov B")));
+    }
+
+    @Test
+    void status_invalid_400_IT() throws Exception {
+        mvc.perform(get("/api/bonds/status?status=Weird"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.error", is("Bad Request")));
+    }
+
+
 
 }

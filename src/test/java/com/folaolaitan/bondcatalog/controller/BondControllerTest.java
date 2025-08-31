@@ -258,6 +258,30 @@ class BondControllerTest {
     }
 
     @Test
+    void status_invalid_400() throws Exception {
+           Mockito.when(service.getBondsByStatus("Weird"))
+                         .thenThrow(new BadRequestException("Invalid status"));
+           mvc.perform(get("/api/bonds/status?status=Weird"))
+                         .andExpect(status().isBadRequest())
+                         .andExpect(jsonPath("$.error", is("Bad Request")));
+    }
+
+    
+    @Test
+    void issuedBetween_startAfterEnd_400() throws Exception {
+           mvc.perform(get("/api/bonds/issued-between?start-date=2025-01-01&end-date=2024-01-01"))
+                         .andExpect(status().isBadRequest());
+    }
+
+    
+    @Test
+    void maturingBetween_badIso_400() throws Exception {
+           mvc.perform(get("/api/bonds/maturing-between/notadate/2029-01-01"))
+                         .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
     void summary_ok() throws Exception {
         Mockito.when(service.getSummary()).thenReturn(Map.of("totalBonds", 2));
         mvc.perform(get("/api/bonds/summary"))

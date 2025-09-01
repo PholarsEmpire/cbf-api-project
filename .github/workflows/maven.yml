@@ -2,9 +2,9 @@ name: CI (Maven)
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ main, master ]
+    branches: [ "main", "master" ]
 
 jobs:
   build-test:
@@ -18,22 +18,32 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: "21"
           cache: maven
 
+      # Linux runners need the wrapper marked executable
+      - name: Grant execute permission for mvnw
+        run: chmod +x mvnw
+
+      # Build, run unit+integration tests, and generate JaCoCo reports
       - name: Build & test with Maven (incl. JaCoCo)
         run: ./mvnw -B -U clean verify
 
-      - name: Upload JaCoCo HTML report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: jacoco-report
-          path: target/site/jacoco/
-
+      # Always try to upload reports (even on failure) for easier debugging
       - name: Upload Surefire test reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: surefire-reports
-          path: target/surefire-reports/
+          path: |
+            **/target/surefire-reports/*
+            **/target/failsafe-reports/*
+          retention-days: 7
+
+      - name: Upload JaCoCo HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-html
+          path: **/target/site/jacoco/*
+          retention-days: 7

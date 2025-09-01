@@ -77,6 +77,10 @@ public class Bond extends Asset {
         this.maturityDate = maturityDate;
     }
 
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
     @Override
     public String toString() {
         return "Bond{" +

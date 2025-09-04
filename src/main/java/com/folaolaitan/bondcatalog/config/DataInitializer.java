@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import com.folaolaitan.bondcatalog.entity.Bond;
 import com.folaolaitan.bondcatalog.repository.BondRepository;
 
-@Configuration
+@Configuration 
 public class DataInitializer {
     // Helper: insert only if unique by (name, issuer, maturityDate)
     private void insertIfMissing(BondRepository repo, Bond b) {

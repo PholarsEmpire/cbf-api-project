@@ -34,3 +34,7 @@ build/
 
 ### Server Details ###
 local.properties
+
+#API key details
+applicationSafe.properties
+

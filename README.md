@@ -1,6 +1,6 @@
 # 📘 Fixed Income (Bond) Catalog API Developed by Folashade Olaitan
 
-A Spring Boot REST API project for managing and analyzing **bonds** — fixed-income financial instruments — designed as part of a software engineering bootcamp with enterprise-grade best practices in **Spring Boot**, **JPA**, **MySQL/H2**, **Swagger/OpenAPI**, **exception handling**, and **testing (JUnit5, Mockito, Testcontainers, JaCoCo)**.
+A Spring Boot REST API project for managing and analyzing **bonds** — fixed-income financial instruments, enriched with **real-time exchange rate/currency conversion** and **macro economic data** (such as GDP and Inflation) via external APIs. This project is designed as part of a software engineering bootcamp with enterprise-grade best practices in **Spring Boot**, **JPA**, **MySQL/H2**, **Swagger/OpenAPI**, **exception handling**, and **testing (JUnit5, Mockito, Testcontainers, JaCoCo)**.
 
 ---
 
@@ -14,18 +14,26 @@ A **bond** is like a loan that investors give to governments, corporations, or i
 
 👉 Think of it this way: **you act like the bank, and the issuer is the borrower.**
 
+Bonds are popular because they offer:
+- steady returns
+- lower risk  compared to stocks,
+- a predictable maturity date
+
 ---
 
 ## 🎯 Purpose of This API
 
 The **Fixed Income (Bond) Catalog API** was built to:  
 
-- 📂 Store, manage, and retrieve information about bonds.  
-- 🔎 Provide filtering & search endpoints (by issuer, rating, coupon, maturity date, face value, or status).  
+- 📂 Store, manage, and retrieve information about bonds. **Full CRUD operations.**
+- 🔎 Provide filtering & search endpoints (by issuer, rating, coupon rate, maturity date, face value, or status).  
 - 📊 Offer a **summary endpoint** with bond statistics (total bonds, average coupon, upcoming maturities etc).  
+- 🌍 **External API Integrations**
+  - 💱 Exchange rates (via [ExchangeRate API](https://exchangerate.host/))
+  - 🌍 World Bank economic indicators (GDP, inflation)
 - 🛡️ Showcase backend engineering best practices.  
 
-💡 In short: this API mimics a simplified **bond catalog system** like one you might find in an **investment bank or financial platform**, but tailored for **learning and demonstration purposes**.
+💡 It is designed as both a **developer-friendly demo project** and a foundation for real-world financial apps. In short: this API mimics a simplified **bond catalog system** like one you might find in an **investment bank or financial platform**, but tailored for **learning and demonstration purposes**.
 
 ---
 
@@ -61,7 +69,7 @@ bondcatalog/
 │   │   │   ├── repository/          # Spring Data JPA repositories (BondRepository)
 │   │   │   ├── service/             # Service layer (BondService)
 │   │   │   ├── customexceptions/    # Custom exceptions & global handler
-│   │   │   └── config/              # Configuration & DataInitializer
+│   │   │   └── config/              # Swagger and WebClient Configurations & DataInitializer
 │   │   └── resources/
 │   │       ├── application.properties (or application.yml) # DB configs, profiles
 │   │       └── static / templates   # (Optional) for static assets / views
@@ -88,7 +96,7 @@ bondcatalog/
 - **JUnit 5 + Mockito** (unit for service and controller classes)  
 - **Spring Boot Test + H2** (integration tests)  
 - **JaCoCo** (test coverage reporting with a minimum of 95% test coverage enforced)  
-- **GitHub Actions** (CI/CD, build, test, coverage reports)
+- **GitHub Actions** (CI/CD pipelien to build, test and generate coverage reports)
 
 ---
 
@@ -127,27 +135,46 @@ H2 Console: `http://localhost:8080/h2-console`
 
 ---
 
-## 🌐 API Endpoints
 
-### 🔹 Core CRUD
-- `GET /api/bonds` → Get all bonds  
-- `GET /api/bonds/{id}` → Get bond by ID  
-- `POST /api/bonds` → Create a new bond  
-- `PUT /api/bonds/{id}` → Update an existing bond  
-- `DELETE /api/bonds/{id}` → Delete a bond  
+## 🚀 Endpoints
 
-### 🔹 Filters & Search
-- `GET /api/bonds/issuer/{issuer}` → Find bonds by issuer  
-- `GET /api/bonds/rating/{rating}` → Find bonds by rating  
-- `GET /api/bonds/coupon-rate/{rate}` → Find bonds with coupon ≥ rate  
-- `GET /api/bonds/coupon-rate/{min}/{max}` → Find bonds within coupon range  
-- `GET /api/bonds/maturing-between/{start}/{end}` → Bonds maturing in date range  
-- `GET /api/bonds/maturity-date/{date}` → Bonds maturing after a date  
-- `GET /api/bonds/issued-between?start-date=YYYY-MM-DD&end-date=YYYY-MM-DD` → Bonds issued in range  
-- `GET /api/bonds/issue-date/{date}` → Bonds issued after date  
-- `GET /api/bonds/face-value/{value}` → Bonds with face value ≥ value  
-- `GET /api/bonds/face-value-between?min-value=X&max-value=Y` → Bonds in face value range  
-- `GET /api/bonds/status?status=Active` → Bonds by status (`Active`, `Matured`, `Defaulted`)  
+### 📘 Bond Endpoints
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET    | `/api/bonds` | List all bonds |
+| GET    | `/api/bonds/{id}` | Get bond by ID |
+| POST   | `/api/bonds` | Create new bond |
+| PUT    | `/api/bonds/{id}` | Update existing bond |
+| DELETE | `/api/bonds/{id}` | Delete bond |
+| GET    | `/api/bonds/issuer/{issuer}` | Search bonds by issuer |
+| GET    | `/api/bonds/rating/{rating}` | Filter by rating |
+| GET    | `/api/bonds/coupon-rate/{rate}` | Bonds with coupon rate ≥ a specified value |
+| GET    | `/api/bonds/coupon-rate/{min}/{max}` | Gets all Bonds within a specified coupon range |
+| GET    | `/api/bonds/maturing-between/{start}/{end}` | Bonds maturing between the specified dates |
+| GET    | `/api/bonds/maturity-date/{date}` | Bonds maturing after the specified date |
+| GET    | `/api/bonds/issued-between?start-date=YYYY-MM-DD&end-date=YYYY-MM-DD` | Bonds issued between dates |
+| GET    | `/api/bonds/issue-date/{date}` | Bonds issued after date |
+| GET    | `/api/bonds/face-value/{value}` | Bonds with face value ≥ specified value |
+| GET    | `/api/bonds/face-value-between?min-value=X&max-value=Y` | Bonds by face value range |
+| GET    | `/api/bonds/status?status=Active` | Bonds by status (Active, Matured, Defaulted) |
+| GET    | `/api/bonds/summary` | Bond catalog summary |
+
+---
+
+### 🌍 External API Endpoints
+
+#### 💱 Exchange Rates
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET    | `/api/external/fx?from=USD&to=NGN` | Get exchange rate from one currency to another |
+| GET    | `/api/external/macro/bonds/{id}/value-in?currency=XXX` | Convert bond’s face value into another currency |
+
+#### 📊 World Bank
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET    | `/api/external/macro/{country}/gdp?year=2022` | GDP for a country (USD current) |
+| GET    | `/api/external/macro/{country}/inflation?year=2022` | Inflation (CPI %) for a country |
+
 
 ### 🔹 Summary
 - `GET /api/bonds/summary` → Returns:  
@@ -165,13 +192,31 @@ H2 Console: `http://localhost:8080/h2-console`
   "maturitiesInNext90Days": 2
 }
 ```
+---
+
+## 📖 API Docs
+
+Swagger UI is available at:
+👉 http://localhost:8080/swagger-ui.html
+
+---
+
+## ⚡ Configuration
+
+### `application.properties`
+
+```properties
+# External API config
+exchange.api.url=https://api.exchangerate.host
+exchange.api.key=0462701b613db5f7c008664dd19d0ac4
+exchange.api.timeout=5000
 
 ---
 
 ## 🧪 Testing
 
 ### Unit Tests
-- **BondService** tested with Mockito  
+- **BondService** tested with JUnit 5 and Mockito  
 - Validates business rules & exception handling  
 
 ### Controller Tests
@@ -182,26 +227,45 @@ H2 Console: `http://localhost:8080/h2-console`
 - Uses **Spring Boot Test + H2 DB**  
 - Verifies repository queries & DB layer  
 
+### Code Coverage: Enforced at **95% minimum with Jacoco**
+
 Run all tests:
 ```bash
 ./mvnw test
 ```
 
-### Coverage (JaCoCo)
-- Configured for **95% minimum coverage**  
+Generate Jacoco Report:
+```bash
+./mvnw clean verify
+```
+
+### Code Test Coverage (Used JaCoCo)
+- Enforced a **95% minimum coverage**  
 - HTML report generated at: `target/site/jacoco/index.html`
 
 ---
 
-## 🚀 CI/CD
+## 🔄 CI/CD (GitHub Actions)
 
-- **GitHub Actions** workflow runs on each push/pull request  
-- Steps include:  
-  - Build & test (`./mvnw clean verify`)  
-  - Run JaCoCo coverage  
-  - Upload HTML coverage report as build artifact  
+Runs on every push & PR
 
-Example workflow: `.github/workflows/maven.yml`
+Steps:
+
+- Build project with Maven
+
+- Run all tests
+
+- Generate JaCoCo report
+
+- Upload test reports as artifacts
+
+👉 See workflow: .github/workflows/maven.yml
+
+---
+## Seed Data
+👉 Sample Data (to test endpoints) located at ./sampleData.sql
+
+
 
 ---
 ## 🚧 Future Improvements/Development
@@ -277,12 +341,10 @@ Example workflow: `.github/workflows/maven.yml`
 ---
 
 
+## 👩‍💻 Author/Maintainer
 
-
-## 👩‍💻 Maintainer
-
-Project developed as part of a **software engineering bootcamp**.  
-Maintained by: **Fola Olaitan**  
+Project developed as part of a software engineering bootcamp by: **Fola Olaitan**  
+💡 Built with Java, Spring Boot & ❤️ for financial data.
 Contact at: **fola@folaolaitan.com** and **+44 7404 545 876**
 
 ---

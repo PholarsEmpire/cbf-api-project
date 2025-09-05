@@ -21,6 +21,7 @@ import java.util.Map;
 @RequestMapping("/api/bonds")
 @Tag(name = "Fixed Income (Bond) Catalog API",
      description = "Endpoints for managing fixed-income/bond investments")
+@CrossOrigin(origins = "http://localhost:5173") // This will allow my frontend to access the API
 public class BondController {
 
     private final BondService service;

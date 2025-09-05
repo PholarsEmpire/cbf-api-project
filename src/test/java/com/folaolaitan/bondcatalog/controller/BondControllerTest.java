@@ -13,9 +13,9 @@ import static org.mockito.ArgumentMatchers.any;
 //import static org.mockito.AdditionalMatchers.eq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -34,7 +34,7 @@ class BondControllerTest {
 
     @Autowired MockMvc mvc;
     @Autowired ObjectMapper om;
-    @MockBean BondService service;
+    @MockitoBean BondService service;
 
     private Bond b() {
         return new Bond(1L, "US Treasury 10Y", "US Government",

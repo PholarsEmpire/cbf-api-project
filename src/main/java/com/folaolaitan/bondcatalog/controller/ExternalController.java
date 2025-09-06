@@ -1,4 +1,3 @@
-// src/main/java/com/folaolaitan/bondcatalog/controller/ExternalController.java
 package com.folaolaitan.bondcatalog.controller;
 
 import com.folaolaitan.bondcatalog.customexceptions.BadRequestException;

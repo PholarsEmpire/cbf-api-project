@@ -32,6 +32,7 @@ The **Fixed Income (Bond) Catalog API** was built to:
   - 💱 Exchange rates (via [ExchangeRate API](https://exchangerate.host/))
   - 🌍 World Bank economic indicators (GDP, inflation)
 - 🛡️ Showcase backend engineering best practices.  
+- **Frontend UI** built with **React + Vite**
 
 💡 It is designed as both a **developer-friendly demo project** and a foundation for real-world financial apps. In short: this API mimics a simplified **bond catalog system** like one you might find in an **investment bank or financial platform**, but tailored for **learning and demonstration purposes**.
 
@@ -89,20 +90,40 @@ bondcatalog/
 
 ## 🛠️ Tech Stack
 
-- **Java 17**  
+- **Java 21**  
 - **Spring Boot 3** (Web, Data JPA)  
 - **MySQL** (main DB for development) + **H2** (test DB)  
-- **Swagger / OpenAPI 3** (API documentation)  
+- **Swagger / OpenAPI 3** (API documentation/Swagger UI)  
 - **JUnit 5 + Mockito** (unit for service and controller classes)  
 - **Spring Boot Test + H2** (integration tests)  
 - **JaCoCo** (test coverage reporting with a minimum of 95% test coverage enforced)  
 - **GitHub Actions** (CI/CD pipelien to build, test and generate coverage reports)
+- **Frontend**: React, Vite
 
 ---
+
+## 🎨 Frontend (React + Vite)
+
+The frontend provides a UI for:  
+- Viewing bond catalog  
+- Creating, editing, deleting bonds  
+- Searching/filtering bonds  
+- Viewing summary statistics  
+- Fetching external data (exchange rates, GDP, inflation)  
+
+### 🔗 Frontend → Backend Integration
+API base URL is set in REACT FRONTEND/bondAPI Frontend folder and `vite.config.js` file:  
+```env
+VITE_BACKEND_URL=http://localhost:8080
+```
+
+---
+
 
 ## ⚙️ Setup Instructions
 
 ### 1. Clone the repository
+Open a bash terminal in Visual Studio code
 ```bash
 git clone https://github.com/PholarsEmpire/cbf-api-project
 cd cbf-api-project
@@ -115,7 +136,7 @@ CREATE DATABASE bondcatalog;
 ```
 - Update your `application.properties` or `application.yml`:
 ```properties
-spring.datasource.url=jdbc:mysql://localhost:3306/bondcatalog
+spring.datasource.url=jdbc:mysql://localhost:8080/bondcatalog
 spring.datasource.username=root
 spring.datasource.password=yourpassword
 spring.jpa.hibernate.ddl-auto=update
@@ -123,7 +144,7 @@ spring.jpa.show-sql=true
 spring.h2.console.enabled=true
 ```
 
-### 3. Run the application
+### 3. Run the backend application
 ```bash
 ./mvnw spring-boot:run
 ```
@@ -133,8 +154,26 @@ Swagger UI available at: `http://localhost:8080/swagger-ui.html`
 
 H2 Console: `http://localhost:8080/h2-console`
 
----
 
+### 4. Setup and run the Frontend (React + Vite)
+
+Open a new separate bash terminal in Visual Studio Code. (Both the front end and backend should run on different terminals)
+
+```bash
+cd cbf-api-project/REACT FRONTEND/bondAPI Frontend
+npm install
+npm run dev
+```
+Frontend will run at:  
+👉 `http://localhost:5173`  
+
+### 5. Test the Application
+- Open the frontend at `http://localhost:5173`  
+- Create and manage bonds via UI  
+- Explore API endpoints via Swagger UI  
+- Try exchange rate and World Bank endpoints  
+
+---
 
 ## 🚀 Endpoints
 
@@ -268,6 +307,34 @@ Steps:
 
 
 ---
+
+## ✅ Reviewer Checklist
+- [✅] Backend runs successfully on `http://localhost:8080`  
+- [✅] Swagger UI available at `http://localhost:8080/swagger-ui.html`  
+- [✅] Frontend runs successfully on `http://localhost:5173`  
+- [✅] CRUD operations on bonds work from UI  
+- [✅] Summary statistics displayed correctly  
+- [✅] Exchange rate & GDP/Inflation endpoints work  
+
+---
+
+## 📸 Screenshots
+
+### Swagger UI
+![Swagger Screenshot1](docs/images/swaggerui1.png)
+![Swagger Screenshot2](docs/images/swaggerui2.png)
+
+### Frontend Bond Catalog
+![Frontend Screenshot1](docs/images/frontend1.png)
+![Frontend Screenshot2](docs/images/frontend2.png)
+
+---
+
+## 📸 Video Walkthrough
+Here is a video walkthrough of how my backend and frontend both tie together
+https://app.screencastify.com/watch/OGg8evNXpeqTgoQnzt96
+---
+
 ## 🚧 Future Improvements/Development
 
 ### 1) API Design & UX
@@ -344,7 +411,7 @@ Steps:
 ## 👩‍💻 Author/Maintainer
 
 Project developed as part of a software engineering bootcamp by: **Fola Olaitan**  
-💡 Built with Java, Spring Boot & ❤️ for financial data.
+💡 Built with Java, Spring Boot, React & ❤️ for financial data.
 Contact at: **fola@folaolaitan.com** and **+44 7404 545 876**
 
 ---

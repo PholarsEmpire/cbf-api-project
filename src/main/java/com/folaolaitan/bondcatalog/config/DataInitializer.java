@@ -10,7 +10,9 @@ import org.springframework.context.annotation.Configuration;
 import com.folaolaitan.bondcatalog.entity.Bond;
 import com.folaolaitan.bondcatalog.repository.BondRepository;
 
-@Configuration 
+// Data initialization configuration to preload bond data into the database
+// It pre-populates the database with 30 sample bonds, ensuring a variety of scenarios for testing.
+@Configuration
 public class DataInitializer {
     // Helper: insert only if unique by (name, issuer, maturityDate)
     private void insertIfMissing(BondRepository repo, Bond b) {
@@ -19,6 +21,8 @@ public class DataInitializer {
         }
     }
 
+    // CommandLineRunner to preload data.
+    // CommandLineRunner is a functional interface that can be used to execute code at startup.
     @Bean
     CommandLineRunner commandLineRunner(BondRepository bondRepository) {
         return args -> {

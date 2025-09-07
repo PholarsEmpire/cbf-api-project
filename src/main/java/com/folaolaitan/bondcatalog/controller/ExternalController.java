@@ -15,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/external")
 @CrossOrigin(origins = "http://localhost:5173")
+// Controller for external API integrations
 public class ExternalController {
 
     private final ExchangeRateService fx;
@@ -28,6 +29,7 @@ public class ExternalController {
     }
 
     // --- FX simple pair endpoint ---
+    // Get exchange rate for a currency pair
     @GetMapping("/fx")
     @Operation(summary = "Gets the current exchange rate between two currencies", description = "Returns the current exchange rate for a pair, e.g., from=USD&to=NGN")
     public BigDecimal getRate(@RequestParam String from, @RequestParam String to) {
@@ -35,6 +37,7 @@ public class ExternalController {
     }
 
     // --- Bond face value converted to target currency ---
+    // Convert a bond's face value to a target currency
     @GetMapping("/bonds/{id}/value-in")
     @Operation(summary = "Convert a bond's face value to a target currency",
                description = "Converts the bond's face value from its currency to the requested currency using live FX rates.")
@@ -63,6 +66,7 @@ public class ExternalController {
     }
 
     // --- World Bank macro endpoints (use ISO codes like USA, NGA, GBR) ---
+    // Get GDP for a specified country
     @GetMapping("/macro/{country}/gdp")
     @Operation(summary = "Get GDP for a specified country", description = "World Bank GDP (current US$). Use the country's ISO code: USA, NGA, GBR, ZAR etc.")
     public Map<String, Object> gdp(@PathVariable String country,
@@ -76,6 +80,7 @@ public class ExternalController {
         );
     }
 
+    // Get inflation for a specified country
     @GetMapping("/macro/{country}/inflation")
     @Operation(summary = "Get inflation for a specified country", description = "World Bank CPI inflation (in percentage). Use the country's ISO code: USA, NGA, GBR, ZAR etc.")
     public Map<String, Object> inflation(@PathVariable String country,

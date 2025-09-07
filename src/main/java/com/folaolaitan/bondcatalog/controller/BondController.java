@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Map;
 
 
+
+// Controller for managing bond-related operations. 
+// This is the main entry point for the Bond API where requests are received from clients (e.g frontend, Swagger UI or Postman) and responses are sent.
 @RestController
 @RequestMapping("/api/bonds")
 @Tag(name = "Fixed Income (Bond) Catalog API",
@@ -32,12 +35,14 @@ public class BondController {
 
     // ---------- CORE CRUD ----------
 
+    // List all bonds
     @GetMapping
     @Operation(summary = "List all bonds", description = "Retrieves every bond in the catalog.")
     public List<Bond> getAllBonds() {
         return service.getAllBonds();
     }
 
+    // Get a bond by ID
     @GetMapping("/{id}")
     @Operation(summary = "Get a bond by ID",
                description = "Returns the bond with the given ID, or 404 if not found.")
@@ -47,6 +52,7 @@ public class BondController {
         return service.getBondById(id); // throws ResourceNotFoundException if missing
     }
 
+    // Endpoint to create a new bond
     @PostMapping
     @Operation(summary = "Create a new bond",
                description = "Creates a bond. ID must be null; DB will generate it.")
@@ -56,6 +62,7 @@ public class BondController {
         return service.createBond(bond); // throws BadRequestException if ID not null
     }
 
+    // Endpoint to update an existing bond
     @PutMapping("/{id}")
     @Operation(summary = "Update an existing bond",
                description = "Updates the bond with the given ID.")
@@ -65,6 +72,7 @@ public class BondController {
         return service.updateBond(id, bond);
     }
 
+    // Delete a bond
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete a bond", description = "Deletes the bond with the given ID.")
     @ApiResponse(responseCode = "200", description = "Bond deleted")
@@ -73,8 +81,11 @@ public class BondController {
         service.deleteBond(id);
     }
 
-    // ---------- SEARCH / FILTER ----------
 
+    // ---------- SEARCH / FILTER ----------
+    // These custom endpoints allow clients to search for bonds based on various criteria.
+
+    // Search bonds by issuer
     @GetMapping("/issuer/{issuer}")
     @Operation(summary = "Search bonds by issuer",
                description = "Case-insensitive contains search by issuer name.")
@@ -84,6 +95,7 @@ public class BondController {
         return service.findBondsByIssuer(issuer);
     }
 
+    // Filter bonds by rating
     @GetMapping("/rating/{rating}")
     @Operation(summary = "Filter bonds by rating",
                description = "Returns all bonds that match the given credit rating.")
@@ -93,6 +105,7 @@ public class BondController {
         return service.findBondsByRating(rating);
     }
 
+    // Filter bonds by coupon rate greater than or equal to a value
     @GetMapping("/coupon-rate/{rate}")
     @Operation(summary = "Find bonds with coupon ≥ rate",
                description = "Returns bonds with coupon rate greater than or equal to the given value.")
@@ -105,6 +118,7 @@ public class BondController {
         return service.findBondsByCouponRateGreaterThanEqual(rate);
     }
 
+    // Filter bonds by coupon rate range
     @GetMapping("/coupon-rate/{min}/{max}")
     @Operation(summary = "Find bonds by coupon rate range",
                description = "Returns bonds with coupon rate between min and max (inclusive).")
@@ -119,6 +133,7 @@ public class BondController {
         return service.findBondsByCouponRateBetween(minRate, maxRate);
     }
 
+    // Find bonds maturing between two dates
     @GetMapping("/maturing-between/{start}/{end}")
     @Operation(summary = "Find bonds maturing between two dates",
                description = "Dates must be ISO format YYYY-MM-DD.")
@@ -139,6 +154,7 @@ public class BondController {
         }
     }
 
+    // Find bonds maturing after a specific date
     @GetMapping("/maturity-date/{date}")
     @Operation(summary = "Find bonds maturing after a date",
                description = "Date must be ISO format YYYY-MM-DD.")
@@ -153,6 +169,7 @@ public class BondController {
         }
     }
 
+    // Find bonds issued between two dates
     @GetMapping("/issued-between")
     @Operation(summary = "Find bonds issued between two dates",
                description = "Dates must be ISO format YYYY-MM-DD. Uses query params `start-date` and `end-date`.")
@@ -173,6 +190,7 @@ public class BondController {
         }
     }
 
+    // Find bonds issued after a specific date
     @GetMapping("/issue-date/{date}")
     @Operation(summary = "Find bonds issued after a date",
                description = "Date must be ISO format YYYY-MM-DD.")
@@ -187,6 +205,7 @@ public class BondController {
         }
     }
 
+    // Find bonds by face value
     @GetMapping("/face-value/{value}")
     @Operation(summary = "Find bonds with face value ≥ value",
                description = "Returns bonds with face value greater than or equal to the specified amount.")
@@ -199,6 +218,7 @@ public class BondController {
         return service.findBondsByFaceValueGreaterThanEqual(value);
     }
 
+    // Find bonds by face value range
     @GetMapping("/face-value-between")
     @Operation(summary = "Find bonds by face value range",
                description = "Uses query params `min-value` and `max-value`. Both must be > 0 and min ≤ max.")
@@ -216,6 +236,7 @@ public class BondController {
         return service.findBondsByFaceValueBetween(minValue, maxValue);
     }
 
+    // Find bonds by status (Active, Matured, Defaulted)
     @GetMapping("/status")
     @Operation(summary = "Find bonds by status",
                description = "Allowed values: Active, Matured, Defaulted. Returns 200 with [] if none.")
@@ -232,7 +253,7 @@ public class BondController {
     }
 
     // ---------- SUMMARY ----------
-
+    // Get overall statistics about the bond catalog
     @GetMapping("/summary")
     @Operation(summary = "Get bond catalog summary",
                description = "Provides statistics about the bond catalog, such as total bonds, average coupon rate, highest coupon rate, unique issuers, etc.")

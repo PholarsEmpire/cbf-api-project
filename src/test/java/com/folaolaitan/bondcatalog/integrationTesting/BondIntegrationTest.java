@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+// Integration tests for Bond API
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
@@ -43,6 +44,7 @@ class BondIntegrationTest {
                 LocalDate.of(2020,1,1), LocalDate.of(2030,1,1), "USD"));
     }
 
+    // Test retrieving all bonds
     @Test
     void getAll_returnsTwo() throws Exception {
         mvc.perform(get("/api/bonds"))
@@ -50,6 +52,7 @@ class BondIntegrationTest {
            .andExpect(jsonPath("$", hasSize(2)));
     }
 
+    // Test creating a new bond and then retrieving it
     @Test
     void post_creates_then_retrieves() throws Exception {
         Bond incoming = new Bond(null, "Corp C 2031", "Corp C",
@@ -69,6 +72,7 @@ class BondIntegrationTest {
         assertThat(repo.findById(saved.getId())).isPresent();
     }
 
+    // Tests filtering bonds by rating
     @Test
     void filter_rating_AAA_returnsGovB() throws Exception {
         mvc.perform(get("/api/bonds/rating/AAA"))
@@ -76,6 +80,15 @@ class BondIntegrationTest {
            .andExpect(jsonPath("$[0].issuer", is("Gov B")));
     }
 
+    //Tests filtering bonds by issuer
+    @Test
+    void filter_issuer_CorpA_returnsCorpA() throws Exception {
+        mvc.perform(get("/api/bonds/issuer/Corp A"))
+           .andExpect(status().isOk())
+           .andExpect(jsonPath("$[0].name", is("Corp A 2028")));
+    }
+
+    // Tests the bond summary endpoint
     @Test
     void summary_hasTotals() throws Exception {
         mvc.perform(get("/api/bonds/summary"))
@@ -83,6 +96,7 @@ class BondIntegrationTest {
            .andExpect(jsonPath("$.totalBonds", is(2)));
     }
 
+    // Tests retrieving a bond by ID
     @Test
     void getById_404_returnsHandledError() throws Exception {
         mvc.perform(get("/api/bonds/99999"))
@@ -90,6 +104,8 @@ class BondIntegrationTest {
            .andExpect(jsonPath("$.error", is("Not Found")));
     }
 
+
+    // Tests filtering bonds by maturity date
     @Test
     void maturityDateAfter_IT() throws Exception {
         mvc.perform(get("/api/bonds/maturity-date/2029-12-31"))
@@ -98,18 +114,21 @@ class BondIntegrationTest {
         .andExpect(jsonPath("$[*].name", hasItem("Gov B 2030")));
     }
 
+    // Tests filtering bonds by minimum coupon rate
     @Test
     void couponRateAtLeast_IT() throws Exception {
         mvc.perform(get("/api/bonds/coupon-rate/3"))
         .andExpect(status().isOk());
     }
 
+    // Tests filtering bonds by maximum coupon rate
     @Test
     void couponRateAtMost_IT() throws Exception {
         mvc.perform(get("/api/bonds/coupon-rate/6"))
         .andExpect(status().isOk());
     }
 
+    // Tests filtering bonds by maximum coupon rate with no results
     @Test
     void couponRateAtMost_noResults_IT() throws Exception {
         mvc.perform(get("/api/bonds/coupon-rate/6"))
@@ -118,6 +137,7 @@ class BondIntegrationTest {
     }
 
 
+    // Tests filtering bonds by coupon rate range
     @Test
     void couponRateBetween_IT() throws Exception {
         mvc.perform(get("/api/bonds/coupon-rate/3/6"))
@@ -125,12 +145,14 @@ class BondIntegrationTest {
         .andExpect(jsonPath("$", not(empty())));
     }
 
+    // Tests filtering bonds by face value range
     @Test
     void faceValueBetween_IT() throws Exception {
         mvc.perform(get("/api/bonds/face-value-between?min-value=500&max-value=1500"))
         .andExpect(status().isOk());
     }
 
+    // Tests filtering bonds by status
     @Test
     void status_empty_OK_withHeader_IT() throws Exception {
         mvc.perform(get("/api/bonds/status?status=Defaulted"))
@@ -139,6 +161,7 @@ class BondIntegrationTest {
         .andExpect(jsonPath("$", hasSize(0)));
     }
 
+    // Tests the full create, update, delete flow for a bond
     @Test
     void create_update_delete_flow_IT() throws Exception {
         // 1) CREATE
@@ -174,6 +197,7 @@ class BondIntegrationTest {
         assertThat(repo.findById(saved.getId())).isEmpty();
     }
 
+    // Tests searching bonds by issuer substring
     @Test
     void issuer_search_IT() throws Exception {
         mvc.perform(get("/api/bonds/issuer/Gov"))
@@ -181,6 +205,7 @@ class BondIntegrationTest {
                 .andExpect(jsonPath("$[*].issuer", hasItem("Gov B")));
     }
 
+    // Tests filtering bonds by status for invalid statuses
     @Test
     void status_invalid_400_IT() throws Exception {
         mvc.perform(get("/api/bonds/status?status=Weird"))

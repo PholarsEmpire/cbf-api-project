@@ -11,6 +11,10 @@ import com.folaolaitan.bondcatalog.customexceptions.BadRequestException;
 import com.folaolaitan.bondcatalog.entity.Bond;
 import com.folaolaitan.bondcatalog.repository.BondRepository;
 
+
+// Service class for managing bonds. It acts as a bridge between the controller and repository layers.
+// It contains methods for business logic related to bond operations. It's like the brain of the application.
+// I see it like a "kitchen" where ingredients (data) are prepared and cooked (processed) before being served (returned to the client).
 @Service
 public class BondService {
     private final BondRepository bondRepository;
@@ -19,8 +23,7 @@ public class BondService {
         this.bondRepository = bondRepository;
     }
 
-    // Methods to handle business logic related to bonds can be added here
-    // For example, methods to create, update, delete, and retrieve bonds
+    // Methods to handle business logic related to bonds are added here
     public List<Bond> getAllBonds() {
         return bondRepository.findAll();
     }
@@ -147,11 +150,11 @@ public class BondService {
     }
 
 
-    
+    // Method to get summary statistics for bonds
+    // This method aggregates key metrics about the bond portfolio
     public Map<String, Object> getSummary() {
         long totalBonds = bondRepository.count();
         BigDecimal avgCoupon = bondRepository.avgCouponRate();
-        //String maxRating = bondRepository.maxRating();
         Long uniqueIssuersCount = bondRepository.uniqueIssuersCount();
         Bond highestCouponBond = bondRepository.findTopByOrderByCouponRateDesc();
         Bond lowestCouponBond = bondRepository.findTopByOrderByCouponRateAsc();
@@ -164,7 +167,6 @@ public class BondService {
         Map<String, Object> summary = new LinkedHashMap<>();
         summary.put("totalBonds", totalBonds);
         summary.put("avgCouponRate", avgCoupon);
-        //summary.put("maxRating", maxRating);
         summary.put("uniqueIssuers", uniqueIssuersCount);
         summary.put("highestCoupon", highestCouponBond != null ? highestCouponBond.getCouponRate() : null);
         summary.put("lowestCoupon", lowestCouponBond != null ? lowestCouponBond.getCouponRate() : null);

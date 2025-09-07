@@ -7,6 +7,8 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 
+
+// Swagger OpenAPI configuration for the API documentation
 @Configuration
 public class SwaggerOpenAPIConfig {
 	@Bean

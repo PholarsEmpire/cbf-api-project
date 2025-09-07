@@ -158,6 +158,7 @@ export default function App() {
 
   const openCreate = () => { setEditingBond(null); setShowForm(true) }
   const openEdit = (bond) => { setEditingBond(bond); setShowForm(true) }
+
   const remove = async (bond) => {
     if (!confirm(`Delete bond "${bond.name}"?`)) return
     const res = await fetch(`/api/bonds/${bond.id}`, { method: 'DELETE' })
@@ -325,8 +326,3 @@ export default function App() {
     </div>
   )
 }
-
-
-
-
-

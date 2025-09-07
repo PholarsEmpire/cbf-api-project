@@ -6,8 +6,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.util.List;
 import java.util.Map;
 
-
-//Enrich sovereign bonds with macro data such as(GDP, inflation, debt-to-GDP).
+// Service class for interacting with the World Bank API to get different economic indicators for all countries
+// Enrich sovereign bonds with macro data such as(GDP, inflation, debt-to-GDP).
 @Service
 public class WorldBankService {
   private final WebClient webClient;
@@ -16,7 +16,7 @@ public class WorldBankService {
      this.webClient = webClient; 
   }
 
-  // Returns the first (latest) value from the WB response
+  // Returns the first (latest) value from the World Bank response
   @SuppressWarnings("unchecked")
   public Double indicatorValue(String countryCode, String indicator, String year) {
     String url = String.format(

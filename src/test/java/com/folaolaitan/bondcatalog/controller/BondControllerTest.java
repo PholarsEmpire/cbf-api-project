@@ -28,6 +28,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+// Unit tests for BondController
 @WebMvcTest(BondController.class)
 @Import(GlobalExceptionHandler.class)
 class BondControllerTest {
@@ -43,7 +44,7 @@ class BondControllerTest {
     }
 
     // ---- CRUD ----
-
+    // Tests listing all bonds with an ok response
     @Test
     void listAll_ok() throws Exception {
         Mockito.when(service.getAllBonds()).thenReturn(List.of(b()));
@@ -52,6 +53,7 @@ class BondControllerTest {
            .andExpect(jsonPath("$[0].issuer", is("US Government")));
     }
 
+    // Tests getting a bond by ID with an ok response
     @Test
     void getById_ok() throws Exception {
         Mockito.when(service.getBondById(1L)).thenReturn(b());
@@ -60,6 +62,7 @@ class BondControllerTest {
            .andExpect(jsonPath("$.name", is("US Treasury 10Y")));
     }
 
+    // Tests getting a bond by ID with a not found response
     @Test
     void getById_404() throws Exception {
         Mockito.when(service.getBondById(99L))
@@ -69,6 +72,7 @@ class BondControllerTest {
            .andExpect(jsonPath("$.error", is("Not Found")));
     }
 
+    // Tests creating a new bond with an ok response
     @Test
     void create_ok() throws Exception {
         Bond incoming = new Bond(null, "Corp A 2028", "Corp A",
@@ -85,6 +89,7 @@ class BondControllerTest {
            .andExpect(jsonPath("$.id", is(10)));
     }
 
+    // Tests creating a new bond with a bad request response/invalid input
     @Test
     void create_badRequest_400() throws Exception {
         Bond incoming = b(); // has id, will trigger BadRequest in service
@@ -97,6 +102,7 @@ class BondControllerTest {
            .andExpect(jsonPath("$.error", is("Bad Request")));
     }
 
+    // Tests updating an existing bond with an ok response
     @Test
     void update_ok() throws Exception {
         Bond patch = new Bond(null, "Updated", "IssuerX",
@@ -110,6 +116,7 @@ class BondControllerTest {
            .andExpect(jsonPath("$.name", is("US Treasury 10Y")));
     }
 
+    // Tests deleting an existing bond with an ok response
     @Test
     void delete_ok() throws Exception {
         mvc.perform(delete("/api/bonds/1"))
@@ -119,6 +126,7 @@ class BondControllerTest {
 
     // ---- FILTERS ----
 
+    // Tests filtering by issuer with an ok response
     @Test
     void issuer_ok() throws Exception {
         Mockito.when(service.findBondsByIssuer("apple")).thenReturn(List.of(b()));
@@ -127,6 +135,7 @@ class BondControllerTest {
            .andExpect(jsonPath("$[0].name", notNullValue()));
     }
 
+    // Tests filtering by rating with an ok response
     @Test
     void rating_ok() throws Exception {
         Mockito.when(service.findBondsByRating("AAA")).thenReturn(List.of(b()));
@@ -135,6 +144,7 @@ class BondControllerTest {
            .andExpect(jsonPath("$[0].rating", is("AAA")));
     }
 
+    // Tests filtering by minimum coupon rate with an ok response
     @Test
     void couponAtLeast_ok() throws Exception {
         Mockito.when(service.findBondsByCouponRateGreaterThanEqual(new BigDecimal("3")))
@@ -144,12 +154,14 @@ class BondControllerTest {
            .andExpect(jsonPath("$[0].couponRate", is(3.50)));
     }
 
+    // Tests filtering by minimum coupon rate with a bad request response
     @Test
     void couponAtLeast_invalid_400() throws Exception {
         mvc.perform(get("/api/bonds/coupon-rate/0"))
            .andExpect(status().isBadRequest());
     }
 
+    // Tests filtering by maximum coupon rate with an ok response
     @Test
     void couponBetween_ok() throws Exception {
         Mockito.when(service.findBondsByCouponRateBetween(3.0, 6.0))
@@ -158,12 +170,14 @@ class BondControllerTest {
            .andExpect(status().isOk());
     }
 
+    // Tests filtering by maximum coupon rate with a bad request response
     @Test
     void couponBetween_invalid_400() throws Exception {
         mvc.perform(get("/api/bonds/coupon-rate/6/3"))
            .andExpect(status().isBadRequest());
     }
 
+    // Tests filtering by maturity date range with an ok response
     @Test
     void maturingBetween_ok() throws Exception {
         Mockito.when(service.findBondsByMaturityDateBetween(any(), any()))
@@ -172,12 +186,14 @@ class BondControllerTest {
            .andExpect(status().isOk());
     }
 
+    // Tests filtering by maturity date range with a bad request response
     @Test
     void maturingBetween_badDate_400() throws Exception {
         mvc.perform(get("/api/bonds/maturing-between/2029-01-01/not-a-date"))
            .andExpect(status().isBadRequest());
     }
 
+    // Tests filtering by maturity date range with start date after end date
     @Test
     void maturityAfter_ok() throws Exception {
         Mockito.when(service.findBondsByMaturityDateAfter(any()))
@@ -186,12 +202,14 @@ class BondControllerTest {
            .andExpect(status().isOk());
     }
 
+    // Test filtering by maturity date with a bad request response
     @Test
     void maturityAfter_badDate_400() throws Exception {
         mvc.perform(get("/api/bonds/maturity-date/bad"))
            .andExpect(status().isBadRequest());
     }
 
+    // Tests filtering by issue date range with an ok response
     @Test
     void issuedBetween_ok() throws Exception {
         Mockito.when(service.findBondsByIssueDateBetween(any(), any()))
@@ -200,12 +218,15 @@ class BondControllerTest {
            .andExpect(status().isOk());
     }
 
+
+    // Tests filtering by issue date range with a bad request response
     @Test
     void issuedBetween_badDate_400() throws Exception {
         mvc.perform(get("/api/bonds/issued-between?start-date=2020-01-01&end-date=bad"))
            .andExpect(status().isBadRequest());
     }
 
+    // Tests filtering by issue date with an ok response
     @Test
     void issueAfter_ok() throws Exception {
         Mockito.when(service.findBondsByIssueDateAfter(any()))
@@ -214,12 +235,14 @@ class BondControllerTest {
            .andExpect(status().isOk());
     }
 
+    // Tests filtering by issue date with a bad request response
     @Test
     void issueAfter_badDate_400() throws Exception {
         mvc.perform(get("/api/bonds/issue-date/bad"))
            .andExpect(status().isBadRequest());
     }
 
+    // Tests filtering by face value with an ok response
     @Test
     void faceValueGte_ok() throws Exception {
         Mockito.when(service.findBondsByFaceValueGreaterThanEqual(new BigDecimal("1000")))
@@ -228,12 +251,14 @@ class BondControllerTest {
            .andExpect(status().isOk());
     }
 
+    // Tests filtering by face value with a bad request response
     @Test
     void faceValueGte_invalid_400() throws Exception {
         mvc.perform(get("/api/bonds/face-value/0"))
            .andExpect(status().isBadRequest());
     }
 
+    // Tests filtering by face value range with an ok response
     @Test
     void faceValueBetween_ok() throws Exception {
         Mockito.when(service.findBondsByFaceValueBetween(new BigDecimal("500"), new BigDecimal("1500")))
@@ -242,12 +267,14 @@ class BondControllerTest {
            .andExpect(status().isOk());
     }
 
+    // Tests filtering by face value range with a bad request response
     @Test
     void faceValueBetween_invalid_400() throws Exception {
         mvc.perform(get("/api/bonds/face-value-between?min-value=1500&max-value=500"))
            .andExpect(status().isBadRequest());
     }
 
+    // Tests filtering by status with an ok response
     @Test
     void status_ok_withEmptyHeader() throws Exception {
         Mockito.when(service.getBondsByStatus("Active")).thenReturn(List.of());
@@ -257,6 +284,7 @@ class BondControllerTest {
            .andExpect(jsonPath("$", hasSize(0)));
     }
 
+    // Tests filtering by status with a bad request response
     @Test
     void status_invalid_400() throws Exception {
            Mockito.when(service.getBondsByStatus("Weird"))
@@ -266,14 +294,14 @@ class BondControllerTest {
                          .andExpect(jsonPath("$.error", is("Bad Request")));
     }
 
-    
+    // Tests filtering by issue date range with a bad request response
     @Test
     void issuedBetween_startAfterEnd_400() throws Exception {
            mvc.perform(get("/api/bonds/issued-between?start-date=2025-01-01&end-date=2024-01-01"))
                          .andExpect(status().isBadRequest());
     }
 
-    
+    // Tests filtering by maturing date with a bad request response
     @Test
     void maturingBetween_badIso_400() throws Exception {
            mvc.perform(get("/api/bonds/maturing-between/notadate/2029-01-01"))
@@ -281,6 +309,7 @@ class BondControllerTest {
     }
 
 
+    // Tests the summary endpoint with an ok response
     @Test
     void summary_ok() throws Exception {
         Mockito.when(service.getSummary()).thenReturn(Map.of("totalBonds", 2));

@@ -6,6 +6,9 @@ import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
 
+// Base class for different types of financial assets. My bonds, stocks, and other assets will extend this class.
+// It provides a common structure and behavior for all asset types.
+
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)           // tables: asset + bond
 @DiscriminatorColumn(name = "asset_type")                // stores “BOND” for bonds, STOCK for Stocks, REIT for Real Estate Investments etc.

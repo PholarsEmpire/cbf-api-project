@@ -9,9 +9,13 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+
+// Global exception handler for the application. A central place to catch and return structured error responses
+// This class handles specific exceptions and returns appropriate HTTP responses
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // Handles resource not found exceptions
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex) {
         Map<String, Object> error = new HashMap<>();
@@ -22,6 +26,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(error);
     }
 
+    // Handles bad request exceptions
     @ExceptionHandler(BadRequestException.class)
     public ResponseEntity<Map<String, Object>> handleBadRequest(BadRequestException ex) {
         Map<String, Object> error = new HashMap<>();
@@ -32,6 +37,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
+    // Handles generic exceptions
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneric(Exception ex) {
         Map<String, Object> error = new HashMap<>();

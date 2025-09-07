@@ -4,7 +4,6 @@ package com.folaolaitan.bondcatalog.external;
 import java.math.BigDecimal;
 import java.util.Map;
 
-//import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -13,6 +12,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 import com.folaolaitan.bondcatalog.config.ExchangeAPIProperties;
 import com.folaolaitan.bondcatalog.customexceptions.BadRequestException;
 
+
+// Service class for fetching foreign exchange rates from an external API
 @Service
 public class ExchangeRateService {
 

@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
 /**
- * Represents a bond entity with its attributes.
+ * Represents a bond entity with its attributes. This class extends the Asset class and adds bond-specific fields.
  */
 @Entity
 @DiscriminatorValue("BOND")

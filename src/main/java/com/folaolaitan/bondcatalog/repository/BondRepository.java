@@ -7,7 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import com.folaolaitan.bondcatalog.entity.Bond;
 
-
+// Repository interface for Bond entity. It provides methods to perform CRUD operations and custom queries.
+// It's like the database access layer for Bond entities.
 public interface BondRepository extends JpaRepository<Bond, Long> {
     // Check if a bond exists with the given name, issuer, and maturity date. This will avoid duplicates
     boolean existsByNameAndIssuerAndMaturityDate(String name, String issuer, LocalDate maturityDate);
